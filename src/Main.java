@@ -11,8 +11,7 @@ public class Main {
 
         // some data to test with
         //supplier details
-        Supplier supplier = new Supplier(1, "MeathCo", "Jane Doe",
-                                        "jane@meath.co", "12345678", "123 bobs st Perth, 6026",
+        Supplier supplier = new Supplier(1, "MeathCo", "Jane Doe","jane@meath.co", "12345678", "123 bobs st Perth, 6026",
                             "Hospitality", "Horrible cook");
 
         //insurance details
