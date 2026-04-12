@@ -17,4 +17,7 @@ public class DeclarationForm extends ComplianceDocument{
     public String getAccessConsequence(){
         return "Blocked";
     }
+
+    public String getSignatory() { return signatory; }
+    public LocalDate getDateSigned() { return dateSigned; }
 }

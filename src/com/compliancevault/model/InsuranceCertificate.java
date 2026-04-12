@@ -21,4 +21,8 @@ public class InsuranceCertificate extends ComplianceDocument{
     public String getAccessConsequence(){
         return "Blocked";
     }
+
+    public String getInsurer() { return insurer; }
+    public String getPolicyNumber() { return policyNumber; }
+    public String getCertificateRef() { return certificateRef; }
 }

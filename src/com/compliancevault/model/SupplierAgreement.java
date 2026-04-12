@@ -14,4 +14,6 @@ public class SupplierAgreement extends ComplianceDocument{
     public String getAccessConsequence(){
         return "Supervised access only";
     }
+
+    public String getAgreementCategory() { return agreementCategory; }
 }
