@@ -1,6 +1,6 @@
 import com.compliancevault.database.DatabaseManager;
-import com.compliancevault.dao.*;
 import com.compliancevault.model.*;
+import com.compliancevault.service.*;
 
 import java.time.LocalDate;
 
@@ -9,51 +9,56 @@ public class Main {
         DatabaseManager.initialiseDatabase();
 
         try {
-            // create and save a supplier
-            SupplierDAO supplierDAO = new SupplierDAO();
-            Supplier supplier = new Supplier(0, "MeathCo", "Jane Doe",
-                    "jane@meath.co", "12345678", "123 Bobs St Perth, 6026",
-                    "Hospitality", "Test supplier");
-            supplierDAO.insert(supplier);
-            System.out.println("Supplier saved with ID: " + supplier.getSupplierId());
+            // === SERVICES ===
+            SupplierService supplierService = new SupplierService();
+            ComplianceService complianceService = new ComplianceService();
+            AuthService authService = new AuthService();
+            NotificationService notificationService = new NotificationService(complianceService);
 
-            // save compliance documents against that supplier
-            ComplianceDocumentDAO docDAO = new ComplianceDocumentDAO();
+            // === AUTH ===
+            System.out.println("--- Auth ---");
+            authService.registerUser("admin", "password123", Role.ADMIN);
+            authService.registerUser("reception", "password456", Role.GENERAL);
 
-            InsuranceCertificate insurance = new InsuranceCertificate(0,
-                    LocalDate.now().minusMonths(6), LocalDate.now().plusDays(60),
-                    "Active", "Allianz", "POL-12345", "CERT-2026-001");
-            docDAO.insert(supplier.getSupplierId(), insurance);
+            System.out.println("Login with wrong password: " + authService.login("admin", "wrong"));
+            System.out.println("Login as admin: " + authService.login("admin", "password123"));
+            System.out.println("Has admin access: " + authService.hasAdminAccess());
 
-            PoliceCheck police = new PoliceCheck(0,
-                    LocalDate.now().minusYears(1), LocalDate.now().plusYears(2),
-                    "Active", "WA Police", LocalDate.now().minusYears(1));
-            docDAO.insert(supplier.getSupplierId(), police);
+            // === SUPPLIER + DOCUMENTS ===
+            System.out.println("\n--- Suppliers ---");
+            Supplier s1 = new Supplier(0, "MeathCo", "Jane Doe", "jane@meath.co",
+                    "0412345678", "123 Bobs St Perth", "Hospitality", "");
+            supplierService.createSupplier(s1);
 
-            DeclarationForm declaration = new DeclarationForm(0,
-                    LocalDate.now().minusYears(2), LocalDate.now().minusDays(30),
-                    "Expired", "Jane Doe", LocalDate.now().minusYears(2));
-            docDAO.insert(supplier.getSupplierId(), declaration);
+            // attach docs via DAO directly for now (a SupplierService.addDocument()
+            // method would be the next refinement)
+            var docDAO = new com.compliancevault.dao.ComplianceDocumentDAO();
+            docDAO.insert(s1.getSupplierId(), new InsuranceCertificate(0,
+                    LocalDate.now().minusMonths(6), LocalDate.now().plusDays(15),
+                    "Active", "Allianz", "POL-123", "CERT-001"));
+            docDAO.insert(s1.getSupplierId(), new PoliceCheck(0,
+                    LocalDate.now().minusYears(1), LocalDate.now().plusDays(30),
+                    "Active", "WA Police", LocalDate.now().minusYears(1)));
 
-            // read them back and check compliance
-            var docs = docDAO.findBySupplierId(supplier.getSupplierId());
-            for (ComplianceDocument doc : docs) {
-                supplier.getComplianceDocuments().add(doc);
+            System.out.println("Compliant: " + complianceService.isCompliant(s1.getSupplierId()));
+
+            // === FUZZY SEARCH ===
+            System.out.println("\n--- Fuzzy Search ---");
+            System.out.println("Search 'meathco' (exact): " + supplierService.searchSuppliers("meathco").size());
+            System.out.println("Search 'meatco' (typo): " + supplierService.searchSuppliers("meatco").size());
+            System.out.println("Search 'hospitality': " + supplierService.searchSuppliers("hospitality").size());
+            System.out.println("Search 'plumbing': " + supplierService.searchSuppliers("plumbing").size());
+
+            // === NOTIFICATIONS ===
+            System.out.println("\n--- Notifications ---");
+            var notifs = notificationService.runDailyCheck();
+            System.out.println("Notifications generated: " + notifs.size());
+            for (var n : notifs) {
+                System.out.println("  [" + n.type() + "] " + n.supplierName()
+                        + " — " + n.documentType() + " expires in " + n.daysUntilExpiry() + " day(s)");
             }
 
-            System.out.println("Documents loaded: " + docs.size());
-            System.out.println("Compliant: " + supplier.isCompliant());
-            System.out.println("Reasons: " + supplier.getNonCompliantReasons());
-
-            // save a user
-            UserDAO userDAO = new UserDAO();
-            User admin = new User(0, "admin", "hashed_password_here", Role.ADMIN);
-            userDAO.insert(admin);
-
-            User loaded = userDAO.findByUsername("admin");
-            System.out.println("User loaded: " + loaded.getUsername() + " - " + loaded.getRole());
-
-            System.out.println("\n--- Phase 2 complete! ---");
+            System.out.println("\n--- Phase 3 complete! ---");
 
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
