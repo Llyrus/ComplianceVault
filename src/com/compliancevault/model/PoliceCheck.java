@@ -17,4 +17,7 @@ public class PoliceCheck extends ComplianceDocument{
     public String getAccessConsequence(){
         return "Blocked";
     }
+
+    public String getCheckProvider() { return checkProvider; }
+    public LocalDate getIssueDate() { return issueDate; }
 }

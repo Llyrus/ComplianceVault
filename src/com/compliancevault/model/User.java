@@ -26,4 +26,10 @@ public class User {
         // TODO: update later to be more granular.
         return this.role == Role.ADMIN;
     }
+
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
+    public String getUsername() { return username; }
+    public String getPasswordHash() { return passwordHash; }
+    public Role getRole() { return role; }
 }

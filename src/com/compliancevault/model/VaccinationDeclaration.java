@@ -17,4 +17,7 @@ public class VaccinationDeclaration extends ComplianceDocument {
     public String getAccessConsequence(){
         return "No restriction";
     }
+
+    public String getVaccinationType() { return vaccinationType; }
+    public boolean isOptional() { return isOptional; }
 }
