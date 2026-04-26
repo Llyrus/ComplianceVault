@@ -73,14 +73,4 @@ public class Supplier {
     public String getCompanyName() {
         return companyName;
     }
-
-    // new getters and setter for DAO
-    public int getSupplierId() { return supplierId; }
-    public void setSupplierId(int supplierId) { this.supplierId = supplierId; }
-    public String getContactName() { return contactName; }
-    public String getEmail() { return email; }
-    public String getPhone() { return phone; }
-    public String getAddress() { return address; }
-    public String getServiceType() { return serviceType; }
-    public String getNotes() { return notes; }
 }

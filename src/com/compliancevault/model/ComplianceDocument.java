@@ -29,11 +29,5 @@ public abstract class ComplianceDocument implements Expirable {
 
     // abstract method each subclass will override
     public abstract String getAccessConsequence();
-
-    public int getDocumentId() { return documentId; }
-    public void setDocumentId(int documentId) { this.documentId = documentId; }
-    public LocalDate getStartDate() { return startDate; }
-    public LocalDate getExpiryDate() { return expiryDate; }
-    public String getStatus() { return status; }
 }
 
